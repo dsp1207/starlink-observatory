@@ -4,3 +4,5 @@ This script checks whether conditions are favorable to see a train of Starlink s
 Here's an example of what that can look like: https://www.youtube.com/watch?v=ytUygPqjXEc
 
 Note: Starlink satellites spread out over time after the launch, so the best time to see them is shortly after launch. You can simply update HEAVENS_ABOVE_URL with the link for future launches. 
+
+I run this as a daily task on pythonanywhere
