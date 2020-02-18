@@ -35,7 +35,7 @@ VISIBILITY_THRESHOLD = 3
 # Maximum temporal distance in seconds between 5 satellites at their highest point. 
 MAX_T_DELTA = 60
 
-# Select your city from the top left at https://heavens-above.com/AllPassesFromLaunch.aspx and use that link (ends with ?lat=...&lng=...&loc=...&tz=...)
+# Select your city from the top left at https://heavens-above.com/StarlinkLaunchPasses.aspx and use that link (ends with ?lat=...&lng=...&loc=...&tz=...)
 HEAVENS_ABOVE_URL = ''
 
 # City ID for OpenWeather from https://openweathermap.org/find?q=
@@ -89,19 +89,22 @@ _soup = BeautifulSoup(_html,'html.parser')
 clickableRows = _soup.find_all('tr',class_='clickableRow')
 for row in clickableRows:
     tds = row.find_all('td')
-    if float(tds[2].text) <= VISIBILITY_THRESHOLD:
-        sat = satellite(date=tds[0].text, url="https://heavens-above.com/"+tds[6].find_all("a")[0]['href'], time=tds[3].text, name=tds[1].text, visibility=float(tds[2].text), startDirection=tds[5].text, startDegs=tds[4].text, highDegs=tds[7].text, endDegs=tds[10].text)
-        visible = checkViz(sat)
-        if visible and datetime.now().date() == sat.datetime.date():
-            sat.isVisible = 1
-            list_of_visible_satellites.append(sat)
-            msg_content = visible[0]
-            msg_url = visible[1]
-            f = urllib.parse.quote_plus(msg_content)
-            u = urllib.parse.quote_plus(msg_url)
-            noti_url = ifttt_url+"?value1="+f+"&value2="+u
-            noti_url_2 = ifttt_mama+"?value1="+f+"&value2="+u
-            sat.noti_url = noti_url
+    try:
+        if float(tds[2].text) <= VISIBILITY_THRESHOLD:
+            sat = satellite(date=tds[0].text, url="https://heavens-above.com/"+tds[6].find_all("a")[0]['href'], time=tds[3].text, name=tds[1].text, visibility=float(tds[2].text), startDirection=tds[5].text, startDegs=tds[4].text, highDegs=tds[7].text, endDegs=tds[10].text)
+            visible = checkViz(sat)
+            if visible and datetime.now().date() == sat.datetime.date():
+                sat.isVisible = 1
+                list_of_visible_satellites.append(sat)
+                msg_content = visible[0]
+                msg_url = visible[1]
+                f = urllib.parse.quote_plus(msg_content)
+                u = urllib.parse.quote_plus(msg_url)
+                noti_url = ifttt_url+"?value1="+f+"&value2="+u
+                noti_url_2 = ifttt_mama+"?value1="+f+"&value2="+u
+                sat.noti_url = noti_url
+     except ValueError:
+        print("No valid magnitude value: {}".format(tds[2].text))
 
 
 for x in range(0, len(list_of_visible_satellites)-5):
